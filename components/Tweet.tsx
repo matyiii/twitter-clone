@@ -20,7 +20,6 @@ function Tweet({ tweet }: Props) {
   useEffect(() => {
     refreshComments();
   }, [])
-  console.log(comments);
   
   return (
     <div className='flex flex-col p-5 space-x-3 border-gray-100 border-y'>
@@ -45,7 +44,7 @@ function Tweet({ tweet }: Props) {
       <div className='flex justify-between mt-3'>
         <div className='flex items-center space-x-3 text-gray-400 cursor-pointer'>
           <ChatBubbleLeftIcon className='w-5 h-5' />
-          <p>99</p> {/* TODO: Comment count */}
+          <p>{comments.length}</p>
         </div>
         <div className='flex items-center space-x-3 text-gray-400 cursor-pointer'>
           <ArrowPathRoundedSquareIcon className='w-5 h-5' />
@@ -59,10 +58,11 @@ function Tweet({ tweet }: Props) {
       </div>
           {/* Comment Box */}
           {comments?.length > 0 && (
-            <div>
+            <div className='p-5 my-2 mt-5 space-y-5 overflow-y-scroll border-t border-gray-100 max-h-44'>
               {comments.map(comment => (
                 <div key={comment._id} className='relative flex space-x-2'>
-                  <img src={comment.profileImg} className='' alt="Image error" />
+                  <hr className='absolute h-8 left-5 top-10 border-x border-twitter/30' />
+                  <img src={comment.profileImage} className='object-cover mt-2 rounded-full h-7 w-7' alt="Image error" />
                   <div>
                     <div className='flex items-center space-x-1'>
                       <p className='mr-1 font-bold'>{comment.username}</p>
