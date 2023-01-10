@@ -1,13 +1,21 @@
-import React, { useRef, useState } from 'react'
+import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { CalendarIcon, FaceSmileIcon, MagnifyingGlassCircleIcon, MapPinIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
+import { Tweet, TweetBody } from '../typings'
+import { fetchTweets } from '../utils/fetchTweets'
+import { toast } from 'react-hot-toast'
 
-function TweetBox() {
+interface Props {
+    setTweets: Dispatch<SetStateAction<Tweet[]>>
+}
+
+function TweetBox({setTweets}: Props) {
     const [input, setInput] = useState<string>('')
     const [image, setImage] = useState<string>('')
     const imageInputRef = useRef<HTMLInputElement>(null)
     const { data: session } = useSession()
     const [imageUrlBoxIsOpen, setImageUrlBoxIsOpen] = useState<boolean>(false)
+
     const addImageToTweet = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault(); //prevent refresh
         if (!imageInputRef.current?.value) {
@@ -15,6 +23,41 @@ function TweetBox() {
         }
         setImage(imageInputRef.current.value);
         imageInputRef.current.value = '';
+        setImageUrlBoxIsOpen(false);
+    }
+
+    const postTweet = async () => {
+        const tweetInfo: TweetBody = {
+            text: input,
+            username: session?.user?.name || 'Unknown user',
+            profileImage: session?.user?.image || 'https://links.papareact.com/gll',
+            image: image,
+        }
+        
+        const result = await fetch(`api/addTweet`,{
+            body: JSON.stringify(tweetInfo),
+            method: 'POST'
+        })
+
+        const json = await result.json();
+
+        const newTweets = await fetchTweets();
+        setTweets(newTweets);
+        
+        toast('Tweet Posted',{
+            icon:'🚀'
+        })
+
+        return json;
+    }
+
+    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+
+        postTweet();
+
+        setInput('');
+        setImage('');
         setImageUrlBoxIsOpen(false);
     }
 
@@ -36,7 +79,7 @@ function TweetBox() {
                             <CalendarIcon className='w-5 h-5' />
                             <MapPinIcon className='w-5 h-5' />
                         </div>
-                        <button disabled={!input || !session} className='px-5 py-2 font-bold text-white rounded-full disabled:opacity-30 bg-twitter'>Tweet</button>
+                        <button onClick={handleSubmit} disabled={!input || !session} className='px-5 py-2 font-bold text-white rounded-full disabled:opacity-30 bg-twitter'>Tweet</button>
                     </div>
                     {imageUrlBoxIsOpen && (
                         <form className='flex px-4 py-2 mt-5 rounded-lg bg-twitter/80'>
