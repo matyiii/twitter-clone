@@ -9,7 +9,7 @@ interface Props {
     setTweets: Dispatch<SetStateAction<Tweet[]>>
 }
 
-function TweetBox({setTweets}: Props) {
+function TweetBox({ setTweets }: Props) {
     const [input, setInput] = useState<string>('')
     const [image, setImage] = useState<string>('')
     const imageInputRef = useRef<HTMLInputElement>(null)
@@ -33,8 +33,8 @@ function TweetBox({setTweets}: Props) {
             profileImage: session?.user?.image || 'https://links.papareact.com/gll',
             image: image,
         }
-        
-        const result = await fetch(`api/addTweet`,{
+
+        const result = await fetch(`api/addTweet`, {
             body: JSON.stringify(tweetInfo),
             method: 'POST'
         })
@@ -43,9 +43,9 @@ function TweetBox({setTweets}: Props) {
 
         const newTweets = await fetchTweets();
         setTweets(newTweets);
-        
-        toast('Tweet Posted',{
-            icon:'🚀'
+
+        toast('Tweet Posted', {
+            icon: '🚀'
         })
 
         return json;
